@@ -10,14 +10,11 @@ import csv
 import numpy as np
 import time
 
-def gendermap(s):
-    if s == 'M':
-        return [1,0,0]
-    elif s == 'F':
-        return [0,1,0]
-    else:
-        return [0,0,1]
-
+gendermap = {
+    'M': [1,0,0],
+    'F': [0,1,0],
+    'I': [0,0,1]
+}
 inputs = []
 outputs = []
 '''
@@ -29,7 +26,7 @@ with open('abalone.csv') as data:
     data = csv.reader(data, delimiter=',')
     for abalone in data:
         if len(abalone) > 0:
-            entrada = gendermap(abalone[0])
+            entrada = gendermap[abalone[0]].copy()
             entrada.extend(list(map(lambda x: float(x), abalone[1:-1])))
             inputs.append(entrada)
             outputs.append(int(abalone[-1]))
