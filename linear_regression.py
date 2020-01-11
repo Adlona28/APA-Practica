@@ -7,6 +7,7 @@ Created on Sat Jan 11 12:53:39 2020
 """
 import numpy as np
 import pandas as pd
+from numpy.linalg import inv, svd, cond, pinv
 from pandas import read_csv
 import matplotlib.pyplot as plt
 from IPython.core.interactiveshell import InteractiveShell
@@ -61,7 +62,13 @@ NMSE_valid = sum((sample.rings - prediccions)**2)/((N_valid-1)*np.var(sample.rin
 print("Normalized MSE on Validation Data:", NMSE_valid)
 R_squared = (1 - NMSE_valid)*100
 print("Our model explain the {}% of the validation data".format(R_squared))
+H= np.diag(model.exog@inv(model.exog.T@model.exog)@model.exog.T)
 
+LOOCV = np.sum( (result.resid_response/(1-H))**2) / N
+print("LOOCV:", LOOCV)
+R2_LOOCV = (1 - LOOCV*N/((N-1)*np.var(sample.rings)))*100
+
+print("R2_LOOCV:", R2_LOOCV)
 fig, ax = plt.subplots(figsize=(8,6))
 ax.plot(range(1,N_valid+1), prediccions, 'ro')
 ax.plot(range(1,N_valid+1), 
