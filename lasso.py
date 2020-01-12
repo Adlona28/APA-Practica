@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jan 11 14:44:06 2020
+Created on Sat Jan 11 19:14:29 2020
 
 @author: alex
 """
 import numpy as np
 import pandas as pd
 from pandas import read_csv
-import matplotlib.pyplot as plt
+from numpy.random import normal
 from numpy.linalg import inv, svd, cond, pinv
+from scipy import stats
 from statsmodels.genmod.generalized_linear_model import GLM
-pd.set_option('precision', 3)
-from sklearn.linear_model import Ridge, RidgeCV
+from sklearn.linear_model import LassoCV, Lasso
+
+
 
 sample = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "length",
@@ -32,39 +34,21 @@ sample_validation = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "viscera_weight", 
                                                        "shell_weight", 
                                                        "rings"])
-
 sample.describe()
 sample_validation.describe()
 N = len(sample)
 N_valid = len(sample_validation)
-#To compare the model with linear regression
+
 model = GLM.from_formula('rings ~ length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 H= np.diag(model.exog@inv(model.exog.T@model.exog)@model.exog.T)
-lambdas = 10**np.arange(-6,2,0.1)
-ridge = RidgeCV(alphas=lambdas,normalize=True)
-ridge.fit(sample.loc[:,'length':'shell_weight'],
-          sample.rings)
-print('\nLAMBDA=',ridge.alpha_)
+lasso =LassoCV(max_iter=5000)
+lasso.fit(sample.loc[:,'length':'shell_weight'],sample.rings)
+print('LAMBDA=',lasso.alpha_)
+alpha = lasso.alpha_
+rings_lasso_reg =Lasso(alpha=alpha, max_iter=5000)
+rings_lasso_reg.fit(sample.loc[:,'length':'shell_weight'],sample.rings)
 
-lambdas = np.arange(0.0001,0.0005,0.000001)
-ridge = RidgeCV(alphas=lambdas,normalize=True,store_cv_values=True)
-ridge.fit(sample.loc[:,'length':'shell_weight'],
-          sample.rings)
-print('LAMBDA=',ridge.alpha_)
-alpha = ridge.alpha_
-rings_ridge_reg = Ridge(alpha=alpha,
-                          normalize=True).fit(sample.loc[:,'length':'shell_weight'],
-                                              sample.rings)
-print(pd.DataFrame([rings_ridge_reg.intercept_,
-              rings_ridge_reg.coef_[0],
-              rings_ridge_reg.coef_[1],
-              rings_ridge_reg.coef_[2],
-              rings_ridge_reg.coef_[3],
-              rings_ridge_reg.coef_[4],
-              rings_ridge_reg.coef_[5],
-              rings_ridge_reg.coef_[6]],
-             index=['Intercept',"length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]))
-prediccions = rings_ridge_reg.predict(sample_validation.loc[:,'length':'shell_weight'])
+prediccions = rings_lasso_reg.predict(sample_validation.loc[:,'length':'shell_weight'])
 
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("Validation MSE:", mean_square_error)
@@ -73,9 +57,20 @@ NMSE_valid = sum((sample.rings - prediccions)**2)/((N_valid-1)*np.var(sample.rin
 print("Normalized MSE on Validation Data:", NMSE_valid)
 R_squared = (1 - NMSE_valid)*100
 print("Our model explain the {}% of the validation data".format(R_squared))
-resid = rings_ridge_reg.predict(sample.loc[:,'length':'shell_weight'])-sample.rings
-LOOCV_ridge = np.sum( (resid/(1-H))**2) / N
-print("LOOCV:", LOOCV_ridge)
-R2_LOOCV_ridge = (1 - LOOCV_ridge*N/((N-1)*np.var(sample.rings)))*100
-print("R2_LOOCV:", R2_LOOCV_ridge)
-# %%
+print('Intercept:', rings_lasso_reg.intercept_)
+print('length:', rings_lasso_reg.coef_[0])
+print('diameter:', rings_lasso_reg.coef_[1])
+print('height:', rings_lasso_reg.coef_[2])
+print('whole_weight:', rings_lasso_reg.coef_[3])
+print('shucked_weight:', rings_lasso_reg.coef_[4])
+print('viscera_weight:', rings_lasso_reg.coef_[5])
+print('shell_weight:', rings_lasso_reg.coef_[6])
+
+resid = rings_lasso_reg.predict(sample.loc[:,'length':'shell_weight'])-sample.rings
+LOOCV_lasso = np.sum( (resid/(1-H))**2) / N
+print("LOOCV:", LOOCV_lasso)
+R2_LOOCV_lasso = (1 - LOOCV_lasso*N/((N-1)*np.var(sample.rings)))*100
+print("R2_LOOCV:", R2_LOOCV_lasso)
+
+
+#%%
