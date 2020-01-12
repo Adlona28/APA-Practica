@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jan 12 00:32:43 2020
+Created on Sun Jan 12 13:37:10 2020
 
 @author: alex
 """
@@ -18,7 +18,7 @@ from numpy.random import uniform, normal
 from statsmodels.genmod.generalized_linear_model import GLM
 from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.metrics import mean_squared_error
-from sklearn.neural_network import MLPRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
@@ -48,45 +48,14 @@ N = len(sample)
 N_valid = len(sample_validation)
 print("{} samples to train and {} samples to validate".format(N, N_valid))
 #%%
-sizes = [2,5,16,32]
-model_nnet = MLPRegressor(alpha=0,
-                           activation="logistic", 
-                           max_iter=100000,
-                           solver='lbfgs')
-trc = GridSearchCV(estimator=model_nnet, 
-                   param_grid ={'hidden_layer_sizes':sizes},
-                   cv=50,
-                   return_train_score=True)
-model_10CV = trc.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
-print(model_10CV.best_score_)
-prediccions = model_10CV.predict(sample.loc[:,"length":"shell_weight"])
+model_rf = RandomForestRegressor(oob_score=True, n_estimators=100000, criterion='mse')
+model_rf.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
+print("Final oob score: ", model_rf.oob_score_)
+prediccions = model_rf.predict(sample.loc[:,"length":"shell_weight"])
 NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
-print("NMSE MLP:", NMSE)
-
-#%%
-model_nnet = MLPRegressor(hidden_layer_sizes=32,
-                           alpha=0,
-                           activation="logistic", 
-                           learning_rate = 'constant',
-                           solver='lbfgs')
-model_nnet.learning_rate_init = 1e-3
-model_nnet.max_iter = 100000
-model_nnet.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
-print("Final loss 1st training module: ", model_nnet.loss_)
-prediccions = model_nnet.predict(sample_validation.loc[:,"length":"shell_weight"])
+print("NMSE Random Forest:", NMSE)
+prediccions = model_rf.predict(sample_validation.loc[:,"length":"shell_weight"])
+mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
+print("MSE validation Random Forest:", mean_square_error)
 NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
-print("NMSE validation MLP before refining:", NMSE_val)
-model_nnet.learning_rate_init = 1e-4
-model_nnet.max_iter = 10000
-model_nnet.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
-#print("Coeficients:", model_nnet.coefs_, "Biasis:", model_nnet.intercepts_)
-print("Final loss: ", model_nnet.loss_)
-prediccions = model_nnet.predict(sample.loc[:,"length":"shell_weight"])
-NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
-print("NMSE MLP:", NMSE)
-prediccions = model_nnet.predict(sample_validation.loc[:,"length":"shell_weight"])
-MSE_valid = np.sum((sample_validation.rings - prediccions)**2)/N_valid
-print("MSE validation MLP:", MSE_valid)
-NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
-print("NMSE validation MLP:", NMSE_val)
-#%%
+print("NMSE validation Random Forest:", NMSE_val)

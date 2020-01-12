@@ -42,7 +42,7 @@ N = len(sample)
 N_valid = len(sample_validation)
 model = GLM.from_formula('rings ~ length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 result = model.fit()
-result.summary()
+print(result.summary())
 
 prediccio = pd.DataFrame({'prediccio':result.predict(sample)})
 
