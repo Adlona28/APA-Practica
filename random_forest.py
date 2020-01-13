@@ -7,19 +7,9 @@
 
 import numpy as np
 import pandas as pd
-from numpy.linalg import inv, svd, cond, pinv
 from pandas import read_csv
 import matplotlib.pyplot as plt
-from IPython.core.interactiveshell import InteractiveShell
-InteractiveShell.ast_node_interactivity = "all"
-pd.set_option('precision', 3)
-from numpy.random import uniform, normal
-from statsmodels.genmod.generalized_linear_model import GLM
-from sklearn.linear_model import Ridge, RidgeCV
-from sklearn.metrics import mean_squared_error
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
 
 

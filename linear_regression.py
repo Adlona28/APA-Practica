@@ -5,18 +5,9 @@
 @authors: Alex Iniesta i Adrià Lozano
 """
 import numpy as np
-import pandas as pd
-from numpy.linalg import inv, svd, cond, pinv
 from pandas import read_csv
 import matplotlib.pyplot as plt
-from IPython.core.interactiveshell import InteractiveShell
-InteractiveShell.ast_node_interactivity = "all"
-pd.set_option('precision', 3)
-from numpy.random import uniform, normal
 from statsmodels.genmod.generalized_linear_model import GLM
-from sklearn.linear_model import Ridge, RidgeCV
-from sklearn.metrics import mean_squared_error
-import pickle
 
 #Lectura de les dades de train i validation
 sample = read_csv("train.csv", delimiter=",", names=["male",

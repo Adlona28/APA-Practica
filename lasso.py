@@ -5,11 +5,8 @@
 @authors: Alex Iniesta i Adrià Lozano
 """
 import numpy as np
-import pandas as pd
-from pandas import read_csv
-from numpy.random import normal
 from numpy.linalg import inv, svd, cond, pinv
-from scipy import stats
+from pandas import read_csv
 from statsmodels.genmod.generalized_linear_model import GLM
 from sklearn.linear_model import LassoCV, Lasso
 

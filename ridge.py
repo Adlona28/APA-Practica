@@ -7,7 +7,6 @@
 import numpy as np
 import pandas as pd
 from pandas import read_csv
-import matplotlib.pyplot as plt
 from numpy.linalg import inv, svd, cond, pinv
 from statsmodels.genmod.generalized_linear_model import GLM
 pd.set_option('precision', 3)

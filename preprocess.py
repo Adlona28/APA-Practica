@@ -15,14 +15,11 @@ rings / integer / -- / +1.5 gives the age in years
 @authors: Alex Iniesta i Adrià Lozano
 """
 
-import csv
 import numpy as np
-import time
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
-from pandas.api.types import is_numeric_dtype
 from sklearn.preprocessing import  StandardScaler
 from sklearn.model_selection import  train_test_split, cross_val_score
 from sklearn.feature_selection import SelectKBest
