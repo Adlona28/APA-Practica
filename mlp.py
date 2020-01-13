@@ -24,7 +24,9 @@ from sklearn.metrics import confusion_matrix, classification_report, accuracy_sc
 
 
 #Lectura de les dades de train i validation
-sample = read_csv("abalone.csv", delimiter=",", names=["sex",
+sample = read_csv("train.csv", delimiter=",", names=["male",
+                                                       "female",
+                                                       "infant",
                                                        "length",
                                                        "diameter",
                                                        "height",
@@ -33,17 +35,17 @@ sample = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "viscera_weight", 
                                                        "shell_weight", 
                                                        "rings"])
-sample_validation = sample[3500:]
-sample = sample[:3500]
-#sample_validation = read_csv("abalone.csv", delimiter=",", names=["sex",
-#                                                       "length",
-#                                                       "diameter",
-#                                                       "height",
-#                                                       "whole_weight",
-#                                                       "shucked_weight",
-#                                                       "viscera_weight", 
-#                                                       "shell_weight", 
-#                                                       "rings"])
+sample_validation = read_csv("test.csv", delimiter=",", names=["male",
+                                                       "female",
+                                                       "infant",
+                                                       "length",
+                                                       "diameter",
+                                                       "height",
+                                                       "whole_weight",
+                                                       "shucked_weight",
+                                                       "viscera_weight", 
+                                                       "shell_weight", 
+                                                       "rings"])
 sample.describe()
 sample_validation.describe()
 N = len(sample)
@@ -66,27 +68,31 @@ NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
 print("NMSE MLP:", NMSE)
 
 #%%
+import time
 model_nnet = MLPRegressor(hidden_layer_sizes=32,
                            alpha=0,
                            activation="logistic", 
                            learning_rate = 'constant',
                            solver='lbfgs')
 model_nnet.learning_rate_init = 1e-3
-model_nnet.max_iter = 100000
-model_nnet.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
+model_nnet.max_iter = 5000
+model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
 print("Final loss 1st training module: ", model_nnet.loss_)
-prediccions = model_nnet.predict(sample_validation.loc[:,"length":"shell_weight"])
+prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+print("MAE on validation data before refining:", MAE)
 NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
 print("NMSE validation MLP before refining:", NMSE_val)
 model_nnet.learning_rate_init = 1e-4
 model_nnet.max_iter = 10000
-#model_nnet.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
+time.sleep(10)
+model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
 #print("Coeficients:", model_nnet.coefs_, "Biasis:", model_nnet.intercepts_)
 print("Final loss: ", model_nnet.loss_)
-prediccions = model_nnet.predict(sample.loc[:,"length":"shell_weight"])
+prediccions = model_nnet.predict(sample.loc[:,"male":"shell_weight"])
 NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
 print("NMSE MLP:", NMSE)
-prediccions = model_nnet.predict(sample_validation.loc[:,"length":"shell_weight"])
+prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
 MAE = np.sum(abs(sample_validation.rings - prediccions))/N
 print("MAE on validation data:", MAE)
 MSE_valid = np.sum((sample_validation.rings - prediccions)**2)/N_valid
