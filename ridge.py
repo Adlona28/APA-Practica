@@ -14,6 +14,8 @@ from statsmodels.genmod.generalized_linear_model import GLM
 pd.set_option('precision', 3)
 from sklearn.linear_model import Ridge, RidgeCV
 
+
+#Lectura de les dades en train i validation
 sample = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "length",
                                                        "diameter",
@@ -37,15 +39,18 @@ sample.describe()
 sample_validation.describe()
 N = len(sample)
 N_valid = len(sample_validation)
-#To compare the model with linear regression
+#Per comparar el model amb regressio lineal
 model = GLM.from_formula('rings ~ length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 H= np.diag(model.exog@inv(model.exog.T@model.exog)@model.exog.T)
+
+#Primer rang de lambdes on fer la CV
 lambdas = 10**np.arange(-6,2,0.1)
 ridge = RidgeCV(alphas=lambdas,normalize=True)
 ridge.fit(sample.loc[:,'length':'shell_weight'],
           sample.rings)
 print('\nLAMBDA=',ridge.alpha_)
 
+#Segon rang de lambdes per trobar un valor més precis
 lambdas = np.arange(0.0001,0.0005,0.000001)
 ridge = RidgeCV(alphas=lambdas,normalize=True,store_cv_values=True)
 ridge.fit(sample.loc[:,'length':'shell_weight'],
@@ -55,7 +60,7 @@ alpha = ridge.alpha_
 rings_ridge_reg = Ridge(alpha=alpha,
                           normalize=True).fit(sample.loc[:,'length':'shell_weight'],
                                               sample.rings)
-print(pd.DataFrame([rings_ridge_reg.intercept_,
+print("Parametres:\n", pd.DataFrame([rings_ridge_reg.intercept_,
               rings_ridge_reg.coef_[0],
               rings_ridge_reg.coef_[1],
               rings_ridge_reg.coef_[2],
@@ -66,6 +71,8 @@ print(pd.DataFrame([rings_ridge_reg.intercept_,
              index=['Intercept',"length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]))
 prediccions = rings_ridge_reg.predict(sample_validation.loc[:,'length':'shell_weight'])
 
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("Validation MSE:", mean_square_error)
 

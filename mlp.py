@@ -22,6 +22,8 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
+
+#Lectura de les dades de train i validation
 sample = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "length",
                                                        "diameter",
@@ -78,13 +80,15 @@ NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(s
 print("NMSE validation MLP before refining:", NMSE_val)
 model_nnet.learning_rate_init = 1e-4
 model_nnet.max_iter = 10000
-model_nnet.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
+#model_nnet.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
 #print("Coeficients:", model_nnet.coefs_, "Biasis:", model_nnet.intercepts_)
 print("Final loss: ", model_nnet.loss_)
 prediccions = model_nnet.predict(sample.loc[:,"length":"shell_weight"])
 NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
 print("NMSE MLP:", NMSE)
 prediccions = model_nnet.predict(sample_validation.loc[:,"length":"shell_weight"])
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+print("MAE on validation data:", MAE)
 MSE_valid = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("MSE validation MLP:", MSE_valid)
 NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))

@@ -15,7 +15,7 @@ from statsmodels.genmod.generalized_linear_model import GLM
 from sklearn.linear_model import LassoCV, Lasso
 
 
-
+#Lectura de les dades en train i validation
 sample = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "length",
                                                        "diameter",
@@ -34,18 +34,21 @@ sample_validation = read_csv("abalone.csv", delimiter=",", names=["sex",
                                                        "viscera_weight", 
                                                        "shell_weight", 
                                                        "rings"])
+
 sample.describe()
 sample_validation.describe()
 N = len(sample)
 N_valid = len(sample_validation)
+print("{} samples to train and {} samples to validate".format(N, N_valid))
 
+#Per comparar el model amb regressio lineal
 model = GLM.from_formula('rings ~ length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 H= np.diag(model.exog@inv(model.exog.T@model.exog)@model.exog.T)
-lasso =LassoCV(max_iter=5000)
+lasso =LassoCV(max_iter=100000)
 lasso.fit(sample.loc[:,'length':'shell_weight'],sample.rings)
-print('LAMBDA=',lasso.alpha_)
+print('alpha=',lasso.alpha_)
 alpha = lasso.alpha_
-rings_lasso_reg =Lasso(alpha=alpha, max_iter=5000)
+rings_lasso_reg =Lasso(alpha=alpha, max_iter=100000)
 rings_lasso_reg.fit(sample.loc[:,'length':'shell_weight'],sample.rings)
 
 prediccions = rings_lasso_reg.predict(sample_validation.loc[:,'length':'shell_weight'])
