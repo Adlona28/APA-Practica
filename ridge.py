@@ -22,8 +22,8 @@ sample = read_csv("train.csv", delimiter=",", names=["male",
                                                        "height",
                                                        "whole_weight",
                                                        "shucked_weight",
-                                                       "viscera_weight", 
-                                                       "shell_weight", 
+                                                       "viscera_weight",
+                                                       "shell_weight",
                                                        "rings"])
 sample_validation = read_csv("test.csv", delimiter=",", names=["male",
                                                        "female",
@@ -33,8 +33,8 @@ sample_validation = read_csv("test.csv", delimiter=",", names=["male",
                                                        "height",
                                                        "whole_weight",
                                                        "shucked_weight",
-                                                       "viscera_weight", 
-                                                       "shell_weight", 
+                                                       "viscera_weight",
+                                                       "shell_weight",
                                                        "rings"])
 sample.describe()
 sample_validation.describe()
@@ -74,7 +74,7 @@ print("Parametres:\n", pd.DataFrame([rings_ridge_reg.intercept_,
               rings_ridge_reg.coef_[7],
               rings_ridge_reg.coef_[8],
               rings_ridge_reg.coef_[9],],
-             index=['Intercept',"male", "female", "infant", "length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]), file=open('coeficients/ridge_regression.txt', 'w'))
+             index=['Intercept',"male", "female", "infant", "length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]), file=open('coeficients/ridge_regression', 'w'))
 prediccions = rings_ridge_reg.predict(sample_validation.loc[:,'male':'shell_weight'])
 
 #Calculem les mètriques sobre el dataset de validacio -o test-

@@ -1,0 +1,2 @@
+Els arxius train.csv i test.csv pertanyen a les dades ja procesades i són les que s'usen per obtenir els models i validar-los. 
+Per executar els codis dels models, (LINUX) amb situar-se des del terminal a la carpeta on es trobin els codis i els fitxes de dades i executar python filename.py ja és suficient, on filename pot ser {lasso, linear_regression, ridge, random_forest, mlp}. 

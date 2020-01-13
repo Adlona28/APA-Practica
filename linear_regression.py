@@ -18,8 +18,8 @@ sample = read_csv("train.csv", delimiter=",", names=["male",
                                                        "height",
                                                        "whole_weight",
                                                        "shucked_weight",
-                                                       "viscera_weight", 
-                                                       "shell_weight", 
+                                                       "viscera_weight",
+                                                       "shell_weight",
                                                        "rings"])
 sample_validation = read_csv("test.csv", delimiter=",", names=["male",
                                                        "female",
@@ -29,8 +29,8 @@ sample_validation = read_csv("test.csv", delimiter=",", names=["male",
                                                        "height",
                                                        "whole_weight",
                                                        "shucked_weight",
-                                                       "viscera_weight", 
-                                                       "shell_weight", 
+                                                       "viscera_weight",
+                                                       "shell_weight",
                                                        "rings"])
 sample.describe()
 sample_validation.describe()
@@ -39,11 +39,11 @@ N_valid = len(sample_validation)
 print("{} samples to train and {} samples to validate".format(N, N_valid))
 
 
-#Definició del model lineal com a combinació lineal de les entrades de les dades. 
+#Definició del model lineal com a combinació lineal de les entrades de les dades.
 model_glm = GLM.from_formula('rings ~ male + female + infant + length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 model = model_glm.fit()
 print(model.summary())
-print(model.params, file=open('coeficients/linear_regression.txt', 'w'))
+print(model.params, file=open('coeficients/linear_regression', 'w'))
 #Fem les prediccions de train
 prediccions = model.predict(sample.loc[:, "male":"shell_weight"])
 
@@ -88,7 +88,7 @@ print("R2_LOOCV:", R2_LOOCV)
 fig, ax = plt.subplots(figsize=(8,6))
 nshow = 20
 ax.plot(range(1,N_valid+1)[:nshow], prediccions[:nshow], 'ro')
-ax.plot(range(1,N_valid+1)[:nshow], 
+ax.plot(range(1,N_valid+1)[:nshow],
        sample_validation.rings[:nshow], 'g^')
 
 # %%
