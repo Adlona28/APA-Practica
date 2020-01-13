@@ -54,12 +54,13 @@ ridge.fit(sample.loc[:,'male':'shell_weight'],
           sample.rings)
 print('\nLAMBDA=',ridge.alpha_)
 
-#Segon rang de lambdes per trobar un valor més precis
+#Segon rang de lambdes per trobar un valor més precis tenint en compte el valor obtingut abans
 lambdas = np.arange(0.0002,0.0005,0.000001)
 ridge = RidgeCV(alphas=lambdas,normalize=True,store_cv_values=True)
 ridge.fit(sample.loc[:,'male':'shell_weight'],
           sample.rings)
 print('LAMBDA=',ridge.alpha_)
+#Un cop trobada la millor alpha, la usem per crear el nostre model de regressio lineal regularitzada definitiu
 alpha = ridge.alpha_
 rings_ridge_reg = Ridge(alpha=alpha,
                           normalize=True).fit(sample.loc[:,'male':'shell_weight'],
@@ -78,6 +79,7 @@ print("Parametres:\n", pd.DataFrame([rings_ridge_reg.intercept_,
              index=['Intercept',"male", "female", "infant", "length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]))
 prediccions = rings_ridge_reg.predict(sample_validation.loc[:,'male':'shell_weight'])
 
+#Calculem les mètriques sobre el dataset de validacio -o test-
 MAE = np.sum(abs(sample_validation.rings - prediccions))/N
 print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid

@@ -47,15 +47,18 @@ print("{} samples to train and {} samples to validate".format(N, N_valid))
 #Per comparar el model amb regressio lineal
 model = GLM.from_formula('rings ~ male + female + infant + length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 H= np.diag(model.exog@inv(model.exog.T@model.exog)@model.exog.T)
+#Apliquem CV per trobar la millor alpha
 lasso =LassoCV(max_iter=100000)
 lasso.fit(sample.loc[:,'male':'shell_weight'],sample.rings)
 print('alpha=',lasso.alpha_)
 alpha = lasso.alpha_
-rings_lasso_reg =Lasso(alpha=alpha, max_iter=100000)
+#Un cop trobada, definim el model de LASSO amb aquesta i fem el fit per definir el model
+rings_lasso_reg =Lasso(alpha=alpha, max_iter=10000)
 rings_lasso_reg.fit(sample.loc[:,'male':'shell_weight'],sample.rings)
 
+#Fem les prediccions sobre el dataset de validació
 prediccions = rings_lasso_reg.predict(sample_validation.loc[:,'male':'shell_weight'])
-
+#Obtenim les mètriques habituals
 MAE = np.sum(abs(sample_validation.rings - prediccions))/N
 print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
@@ -65,6 +68,7 @@ NMSE_valid = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var
 print("Normalized MSE on Validation Data:", NMSE_valid)
 R_squared = (1 - NMSE_valid)*100
 print("Our model explain the {}% of the validation variance".format(R_squared))
+#Mostrem els paràmetres del nostre model
 print('Intercept:', rings_lasso_reg.intercept_)
 print('male:', rings_lasso_reg.coef_[0])
 print('female:', rings_lasso_reg.coef_[1])
@@ -77,6 +81,7 @@ print('shucked_weight:', rings_lasso_reg.coef_[7])
 print('viscera_weight:', rings_lasso_reg.coef_[8])
 print('shell_weight:', rings_lasso_reg.coef_[9])
 
+#I mètriques addicionals que serveixen de comparació amb el model de regressió lineal
 resid = rings_lasso_reg.predict(sample.loc[:,'male':'shell_weight'])-sample.rings
 LOOCV_lasso = np.sum( (resid/(1-H))**2) / N
 print("LOOCV:", LOOCV_lasso)
