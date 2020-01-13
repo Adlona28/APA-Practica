@@ -89,14 +89,22 @@ time.sleep(10)
 model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
 #print("Coeficients:", model_nnet.coefs_, "Biasis:", model_nnet.intercepts_)
 print("Final loss: ", model_nnet.loss_)
+#Fem les prediccions sobre el dataset de train
 prediccions = model_nnet.predict(sample.loc[:,"male":"shell_weight"])
+#Obtenim R-Squared sobre train
 NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
 print("NMSE MLP:", NMSE)
+R_squared = (1 - NMSE)*100
+print("Our model explain the {}% of the train variance".format(R_squared))
+#Fem les prediccions sobre el dataset de validacio
 prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
+#Obtenim les mètriques que ens serviran per comparar els diferents models
 MAE = np.sum(abs(sample_validation.rings - prediccions))/N
 print("MAE on validation data:", MAE)
 MSE_valid = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("MSE validation MLP:", MSE_valid)
 NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
 print("NMSE validation MLP:", NMSE_val)
+R_squared = (1 - NMSE_val)*100
+print("Our model explain the {}% of the validation variance".format(R_squared))
 #%%

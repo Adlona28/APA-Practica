@@ -82,10 +82,12 @@ print("MSE on validation data:", mean_square_error)
 NMSE_valid = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
 print("Normalized MSE on Validation Data:", NMSE_valid)
 
-#Calculem R_squared per fer-nos una idea de la accuracy del model
+#Calculem R_squared per fer-nos una idea de la capacitat del model
 R_squared = (1 - NMSE_valid)*100
 print("Our model explain the {}% of the validation variance".format(R_squared))
 
+
+#I mètriques addicionals que serveixen de comparació amb el model de regressió lineal
 H= np.diag(model_glm.exog@inv(model_glm.exog.T@model_glm.exog)@model_glm.exog.T)
 
 LOOCV = np.sum( (model.resid_response/(1-H))**2) / N

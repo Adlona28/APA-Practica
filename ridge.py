@@ -85,10 +85,12 @@ print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("Validation MSE:", mean_square_error)
 
+#Calculem R_squared per fer-nos una idea de la capacitat del model
 NMSE_valid = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
 print("Normalized MSE on Validation Data:", NMSE_valid)
 R_squared = (1 - NMSE_valid)*100
 print("Our model explain the {}% of the validation variance".format(R_squared))
+#I mètriques addicionals que serveixen de comparació amb el model de regressió lineal
 resid = rings_ridge_reg.predict(sample.loc[:,'male':'shell_weight'])-sample.rings
 LOOCV_ridge = np.sum( (resid/(1-H))**2) / N
 print("LOOCV:", LOOCV_ridge)
