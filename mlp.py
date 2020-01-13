@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jan 12 00:32:43 2020
 
-@author: alex
+@authors: Alex Iniesta i Adrià Lozano
 """
 
 import numpy as np
@@ -51,42 +50,81 @@ sample_validation.describe()
 N = len(sample)
 N_valid = len(sample_validation)
 print("{} samples to train and {} samples to validate".format(N, N_valid))
-#%%
-sizes = [2,5,16,32]
-model_nnet = MLPRegressor(alpha=0,
+
+
+#%% MLP Single layer
+sizes = [2,5,16,32, 64, 128, 172, 256, 384, 512]
+mse = None
+size_ideal_mse = None
+mses = []
+for size in sizes:
+    print("Testing {} estimators...".format(size), end='\r')
+    model_nnet = MLPRegressor(hidden_layer_sizes=size,
+                              alpha=0,
+                               activation="logistic", 
+                               max_iter=1000,
+                               solver='lbfgs')
+    model_nnet = model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
+    #Ens guardem el nombre amb millor mse
+    prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
+    MSE = np.sum((sample_validation.rings - prediccions)**2)/N_valid
+    if mse is None or mse > MSE:
+        size_ideal_mse = size
+        mse = MSE
+    mses.append(MSE)
+
+
+size = size_ideal_mse 
+print("Best config with {}".format(size))
+
+model_nnet = MLPRegressor(hidden_layer_sizes=size,
+                          alpha=0,
                            activation="logistic", 
-                           max_iter=100000,
+                           max_iter=1000,
                            solver='lbfgs')
-trc = GridSearchCV(estimator=model_nnet, 
-                   param_grid ={'hidden_layer_sizes':sizes},
-                   cv=50,
-                   return_train_score=True)
-model_10CV = trc.fit(sample.loc[:,"length":"shell_weight"],sample.rings)
-print(model_10CV.best_score_)
-prediccions = model_10CV.predict(sample.loc[:,"length":"shell_weight"])
+model_nnet = model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
+print(model_nnet.get_params(), file=open('coeficients/mlp_singlelayer', 'w'))
+
+prediccions = model_nnet.predict(sample.loc[:,"male":"shell_weight"])
+#Obtenim R-Squared sobre train
 NMSE = sum((sample.rings - prediccions)**2)/((N-1)*np.var(sample.rings))
 print("NMSE MLP:", NMSE)
+R_squared = (1 - NMSE)*100
+print("Our model explain the {}% of the train variance".format(R_squared))
 
-#%%
+
+#Obtenim les mètriques que ens serviran per comparar els diferents models
+prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
+print("MAE on validation data:", MAE)
+MSE_valid = np.sum((sample_validation.rings - prediccions)**2)/N_valid
+print("MSE validation MLP:", MSE_valid)
+NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
+print("NMSE validation MLP:", NMSE_val)
+R_squared = (1 - NMSE_val)*100
+print("Our model explain the {}% of the validation variance".format(R_squared))
+
+#%% MLP MultiLayer
 import time
-model_nnet = MLPRegressor(hidden_layer_sizes=32,
+model_nnet = MLPRegressor(hidden_layer_sizes=[128,  64, 32],
                            alpha=0,
                            activation="logistic", 
                            learning_rate = 'constant',
                            solver='lbfgs')
 model_nnet.learning_rate_init = 1e-3
-model_nnet.max_iter = 5000
+model_nnet.max_iter = 500
 model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
 print("Final loss 1st training module: ", model_nnet.loss_)
 prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
-MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
 print("MAE on validation data before refining:", MAE)
 NMSE_val = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))
 print("NMSE validation MLP before refining:", NMSE_val)
-model_nnet.learning_rate_init = 1e-4
-model_nnet.max_iter = 10000
+model_nnet.learning_rate_init = 1e-5
+model_nnet.max_iter = 500
 time.sleep(10)
 model_nnet.fit(sample.loc[:,"male":"shell_weight"],sample.rings)
+print(model_nnet.get_params(), file=open('coeficients/mlp_multilayer', 'w'))
 #print("Coeficients:", model_nnet.coefs_, "Biasis:", model_nnet.intercepts_)
 print("Final loss: ", model_nnet.loss_)
 #Fem les prediccions sobre el dataset de train
@@ -99,7 +137,7 @@ print("Our model explain the {}% of the train variance".format(R_squared))
 #Fem les prediccions sobre el dataset de validacio
 prediccions = model_nnet.predict(sample_validation.loc[:,"male":"shell_weight"])
 #Obtenim les mètriques que ens serviran per comparar els diferents models
-MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
 print("MAE on validation data:", MAE)
 MSE_valid = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("MSE validation MLP:", MSE_valid)

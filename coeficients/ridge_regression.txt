@@ -1,0 +1,13 @@
+Parametres:
+                      0
+Intercept        4.537
+male             0.313
+female           0.228
+infant          -0.543
+length          -0.493
+diameter         4.731
+height           5.444
+whole_weight    15.490
+shucked_weight -17.658
+viscera_weight  -3.508
+shell_weight     4.506

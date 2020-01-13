@@ -1,0 +1,12 @@
+Intercept          3.402
+male               1.448
+female             1.361
+infant             0.594
+length            -0.540
+diameter           4.797
+height             5.436
+whole_weight      16.457
+shucked_weight   -18.123
+viscera_weight    -3.729
+shell_weight       4.187
+dtype: float64

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jan 12 13:37:10 2020
 
-@author: alex
+@authors: Alex Iniesta i Adrià Lozano
 """
 
 import numpy as np
@@ -53,7 +52,7 @@ N = len(sample)
 N_valid = len(sample_validation)
 print("{} samples to train and {} samples to validate".format(N, N_valid))
 #%%
-ntrees = np.array(np.round(10**np.arange(1.2,3.8,0.2)),dtype=int)
+ntrees = np.array(np.round(10**np.arange(1.2,3,0.1)),dtype=int)
 oob_score = None
 n_ideal = None
 mse = None
@@ -78,8 +77,9 @@ for n_est in ntrees:
     oobs.append(model_rf.oob_score_)
 
 
-n_trees = (n_ideal + n_ideal_mse) // 2 #Esperem que les dos n trobades siguin la mateixa, pero per si a alguna execució no ho son, 
-#ens amb el valor mitjà
+n_trees = (n_ideal + n_ideal_mse)//2#Esperem que les dos n trobades siguin la mateixa, pero per si a alguna execució no ho son, 
+#ens amb el valor mitjà 
+print("Best config with {} and {} so {}".format(n_ideal, n_ideal_mse, n_trees))
 #Plot per veure el progrés de oob i mse en funció dels estimators
 fig, ax = plt.subplots(figsize=(8,6))
 ax.plot(ntrees, mses, 'r')
@@ -98,7 +98,7 @@ print("Our model explain the {}% of the train variance".format(R_squared))
 #Fem les prediccions sobre el dataset de validacio
 prediccions = model_rf.predict(sample_validation.loc[:,"male":"shell_weight"])
 #Obtenim les mètriques que ens serviran per comparar els diferents models
-MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
 print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("MSE validation Random Forest:", mean_square_error)

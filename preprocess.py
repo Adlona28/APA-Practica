@@ -10,13 +10,16 @@ Shucked weight / continuous / grams / weight of meat
 Viscera weight / continuous / grams / gut weight (after bleeding)
 Shell weight / continuous / grams / after being dried
 rings / integer / -- / +1.5 gives the age in years
+
+
+@authors: Alex Iniesta i Adrià Lozano
 """
 
 import csv
 import numpy as np
 import time
 import seaborn as sns
-import pandas as pd 
+import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
 from pandas.api.types import is_numeric_dtype
@@ -28,7 +31,7 @@ import os
 import warnings
 warnings.filterwarnings('ignore')
 
-def grafiques(abalone):    
+def grafiques(abalone):
     sns.set()
 
     abalone = pd.read_csv('abalone.csv', sep=',')
@@ -69,7 +72,7 @@ def grafiques(abalone):
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['length'], color=colors[i % 3])
-        
+
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['diam'], color=colors[i % 3])
@@ -81,7 +84,7 @@ def grafiques(abalone):
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['length'], kde=False, bins=np.arange(0.0, 0.9, 0.05), color=colors[i % 3])
-        
+
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['diam'], kde=False, bins=np.arange(0.0, 0.7, 0.05), color=colors[i % 3])
@@ -117,7 +120,7 @@ def grafiques(abalone):
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['length'], color=colors[i % 3])
-        
+
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['diam'], color=colors[i % 3])
@@ -129,7 +132,7 @@ def grafiques(abalone):
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['length'], kde=False, bins=np.arange(0.0, 0.9, 0.05), color=colors[i % 3])
-        
+
     i += 1
     plt.subplot(lines, rows, i)
     _ = sns.distplot(abalone['diam'], kde=False, bins=np.arange(0.0, 0.7, 0.05), color=colors[i % 3])
@@ -178,7 +181,7 @@ def elimOutliers(abalone_df):
     return dataset.drop(indexes[0])
 
 def createTestAndTrain(partToTest, dataset):
-    
+
     """
     msk = np.random.rand(len(dataset)) < partToTrain
     train = dataset[msk]
@@ -191,26 +194,26 @@ def createTestAndTrain(partToTest, dataset):
     selectkBest = SelectKBest()
     X_new = selectkBest.fit_transform(X, y)
     X_train, X_test, y_train, y_test = train_test_split(X_new, y, test_size = partToTest)
-    
+
 
     df1 = pd.DataFrame(X_train)
-    x = df1.values 
+    x = df1.values
     min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = min_max_scaler.fit_transform(x)
     df1 = pd.DataFrame(x_scaled)
 
     df2 = pd.DataFrame(y_train)
-    
+
 
     df3 = pd.DataFrame(X_test)
-    x = df3.values 
+    x = df3.values
     min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = min_max_scaler.fit_transform(x)
     df3 = pd.DataFrame(x_scaled)
 
     df4 = pd.DataFrame(y_test)
 
-    
+
     df1.to_csv('df1.csv')
     df2.to_csv('df2.csv')
     df3.to_csv('df3.csv')
@@ -242,7 +245,7 @@ def createTestAndTrain(partToTest, dataset):
                             fline2 = fline2 + c
                             borrar2 = False
                     else:
-                        fline2 = fline2 + c      
+                        fline2 = fline2 + c
                 f.write(fline1+fline2)
     with open("df3.csv", "r") as f:
         lines1 = f.readlines()
@@ -270,16 +273,15 @@ def createTestAndTrain(partToTest, dataset):
                             fline2 = fline2 + c
                             borrar2 = False
                     else:
-                        fline2 = fline2 + c      
+                        fline2 = fline2 + c
                 f.write(fline1+fline2)
     os.remove("df1.csv")
     os.remove("df2.csv")
     os.remove("df3.csv")
     os.remove("df4.csv")
-    
+
 dataset = pd.read_csv("abalone.csv")
 X = dataset.drop('rings', axis = 1)
 grafiques(dataset)
 dataset=elimOutliers(dataset)
 createTestAndTrain(0.20, dataset)
-

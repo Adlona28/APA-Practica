@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jan 11 12:53:39 2020
 
-@author: alex
+@authors: Alex Iniesta i Adrià Lozano
 """
 import numpy as np
 import pandas as pd
@@ -17,7 +16,7 @@ from numpy.random import uniform, normal
 from statsmodels.genmod.generalized_linear_model import GLM
 from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.metrics import mean_squared_error
-
+import pickle
 
 #Lectura de les dades de train i validation
 sample = read_csv("train.csv", delimiter=",", names=["male",
@@ -53,7 +52,7 @@ print("{} samples to train and {} samples to validate".format(N, N_valid))
 model_glm = GLM.from_formula('rings ~ male + female + infant + length + diameter + height + whole_weight + shucked_weight + viscera_weight + shell_weight', sample)
 model = model_glm.fit()
 print(model.summary())
-
+print(model.params, file=open('coeficients/linear_regression.txt', 'w'))
 #Fem les prediccions de train
 prediccions = model.predict(sample.loc[:, "male":"shell_weight"])
 
@@ -73,10 +72,10 @@ print("Normalized MSE:", NMSE)
 #Fem la prediccio sobre les dades de validation
 prediccions = model.predict(sample_validation.loc[:, "male":"shell_weight"])
 #I obtenim les mètriques, com abans, pero sobre validation
-MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
 print("MAE on validation data:", MAE)
 
-mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N
+mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("MSE on validation data:", mean_square_error)
 
 NMSE_valid = sum((sample_validation.rings - prediccions)**2)/((N_valid-1)*np.var(sample_validation.rings))

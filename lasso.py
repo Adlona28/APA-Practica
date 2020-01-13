@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jan 11 19:14:29 2020
 
-@author: alex
+@authors: Alex Iniesta i Adrià Lozano
 """
 import numpy as np
 import pandas as pd
@@ -56,10 +55,11 @@ alpha = lasso.alpha_
 rings_lasso_reg =Lasso(alpha=alpha, max_iter=10000)
 rings_lasso_reg.fit(sample.loc[:,'male':'shell_weight'],sample.rings)
 
+print(rings_lasso_reg.coef_, file=open('coeficients/lasso', 'w'))
 #Fem les prediccions sobre el dataset de validació
 prediccions = rings_lasso_reg.predict(sample_validation.loc[:,'male':'shell_weight'])
 #Obtenim les mètriques habituals
-MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
 print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("Validation MSE:", mean_square_error)

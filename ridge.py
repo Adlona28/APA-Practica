@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jan 11 14:44:06 2020
 
-@author: alex
+@authors: Alex Iniesta i Adrià Lozano
 """
 import numpy as np
 import pandas as pd
@@ -76,11 +75,11 @@ print("Parametres:\n", pd.DataFrame([rings_ridge_reg.intercept_,
               rings_ridge_reg.coef_[7],
               rings_ridge_reg.coef_[8],
               rings_ridge_reg.coef_[9],],
-             index=['Intercept',"male", "female", "infant", "length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]))
+             index=['Intercept',"male", "female", "infant", "length","diameter","height", "whole_weight","shucked_weight","viscera_weight", "shell_weight"]), file=open('coeficients/ridge_regression.txt', 'w'))
 prediccions = rings_ridge_reg.predict(sample_validation.loc[:,'male':'shell_weight'])
 
 #Calculem les mètriques sobre el dataset de validacio -o test-
-MAE = np.sum(abs(sample_validation.rings - prediccions))/N
+MAE = np.sum(abs(sample_validation.rings - prediccions))/N_valid
 print("MAE on validation data:", MAE)
 mean_square_error = np.sum((sample_validation.rings - prediccions)**2)/N_valid
 print("Validation MSE:", mean_square_error)
